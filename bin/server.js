@@ -10,7 +10,7 @@ const connection = mongoose.connect(DB_HOST, {
   // promiseLibrary: global.Promise,
   useNewUrlParser: true,
   useCreateIndex: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
   // useFindAndModify: false,
 })
 

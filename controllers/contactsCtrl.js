@@ -45,12 +45,15 @@ const add = async (req, res, next) => {
   })
   try {
     await contactSchema.validateAsync(req.body)
+    const id = v4()
+    const user = req.body.name
     const body = {
-      id: v4(),
-      name: req.body.name,
+      id: id,
+      name: user,
       email: req.body.email,
       phone: req.body.phone,
-      favorite: req.body.favorite
+      favorite: req.body.favorite,
+      owner: {id, user}
     }
 
     const data = await contactsService.addContact(body)
