@@ -15,11 +15,15 @@ const contactSchema = new Schema(
     favorite: {
       type: Boolean,
       default: false,
+    },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
     }
   },
   { versionKey: false }
 )
 
-const Contact = new model('Contact', contactSchema)
+const Contact = model('Contact', contactSchema)
 
 module.exports = Contact
