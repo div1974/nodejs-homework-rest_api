@@ -4,10 +4,13 @@ const cors = require('cors')
 const passport = require('passport')
 const contactsRouter = require('./routes/api/contacts')
 const usersRouter = require('./routes/api/users')
-
+const path = require('path')
 const app = express()
 
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short'
+
+// app.use(express.static(path.join(__dirname + '/public')))
+app.use(express.static(path.join(process.cwd(), 'public')))
 
 app.use(logger(formatsLogger))
 app.use(cors())

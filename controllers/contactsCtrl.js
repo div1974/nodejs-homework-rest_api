@@ -53,7 +53,7 @@ const add = async (req, res, next) => {
       email: req.body.email,
       phone: req.body.phone,
       favorite: req.body.favorite,
-      owner: {id, user}
+      owner: { id, user }
     }
 
     const data = await contactsService.addContact(body)
