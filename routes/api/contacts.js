@@ -1,7 +1,7 @@
 const express = require('express')
 const routerContacts = express.Router()
 
-const { ctrlContact} = require('../../controllers')
+const { ctrlContact } = require('../../controllers')
 
 routerContacts.get('/', ctrlContact.get)
 

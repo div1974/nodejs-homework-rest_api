@@ -4,15 +4,11 @@ const getUser = (email) => {
   return User.findOne(email)
 }
 
-const updateUser = (id, userToken) => {
-  return User.updateOne({ _id: id }, { token: userToken})
+const updateUser = (id, updateKey, updateValue) => {
+  return User.updateOne({ _id: id }, { [updateKey]: updateValue })
 }
 
 const addUser = ({ email, password, subscription }) => {
-//   const codedPsw = User.setPassword(password)
-//   const result = User.create({ email, codedPsw, subscription })  
-//   return result
-
   const newUser = new User({ email, password, subscription })
   newUser.setPassword(password)
   const result = newUser.save()
