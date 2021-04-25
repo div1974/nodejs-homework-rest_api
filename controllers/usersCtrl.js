@@ -1,10 +1,10 @@
 const { usersService } = require('../services')
 const Joi = require('joi')
-
+const { v4 } = require('uuid')
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
 const path = require('path')
-
+const emailService = require('../helpers/email')
 const fs = require('fs').promises
 
 const imgRefactoring = require('../helpers/imgResize')
@@ -33,7 +33,13 @@ const regUser = async (req, res, next) => {
       })
     }
 
-    const result = await usersService.addUser({ email, password, subscription })
+    const verifyToken = v4()
+    try {
+      await emailService.sendEmail(verifyToken, email)
+    } catch (err) {
+      throw new Error(503, err.message, 'Service unavailable')
+    }
+    const result = await usersService.addUser({ email, password, subscription, verifyToken })
     res.status(201).json({
       status: 'success',
       code: 201,
@@ -60,7 +66,7 @@ const loginUser = async (req, res, next) => {
 
     const user = await usersService.getUser({ email })
 
-    if (!user || !user.validPassword(password)) {
+    if (!user || !user.validPassword(password) || !user.verify) {
       return res.status(400).json({
         status: '401 Unauthorized',
         message: 'Incorrect login or password',
@@ -150,10 +156,81 @@ const avatars = async (req, res, next) => {
   }
 }
 
+const verifyToken = async (req, res, next) => {
+  try {
+    const result = await usersService.verify(req.params)
+
+    if (result) {
+      return res.json({
+        status: '200 OK',
+        ResponseBody: {
+          message: 'Verification successful',
+
+        }
+      })
+    } else {
+      return next({
+        status: 'BAD_REQUEST',
+        ResponseBody: {
+          message: 'Your Verification token is not valid. Contact administration'
+        }
+      })
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+
+const doubleEmailVerify = async (req, res, next) => {
+  const { email } = req.body
+  const userSchema = Joi.object({
+
+    email: Joi.required()
+
+  })
+
+  try {
+    await userSchema.validateAsync(req.body)
+
+    const user = await usersService.getUser({ email })
+
+    if (!user) {
+      return res.status(400).json({
+        status: '400 BAD REQUEST',
+        message: 'Email not found',
+
+      })
+    }
+
+    if (user.verify) {
+      return res.status(400).json({
+        status: '400 BAD REQUEST',
+        message: 'Verification has already been passed',
+      })
+    }
+    const verifyToken = user.verifyToken
+    try {
+      await emailService.sendEmail(verifyToken, email)
+    } catch (err) {
+      throw new Error(503, err.message, 'Service unavailable')
+    }
+    res.json({
+      status: '200 OK',
+      ResponseBody: {
+        message: 'Verification email sent'
+      }
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   regUser,
   loginUser,
   getUser,
   logoutUser,
-  avatars
+  avatars,
+  verifyToken,
+  doubleEmailVerify
 }
