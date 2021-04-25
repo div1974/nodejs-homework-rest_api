@@ -10,5 +10,6 @@ routerUsers.post('/login', express.json(), ctrlUser.loginUser)
 routerUsers.post('/logout', authModule.auth, ctrlUser.logoutUser)
 routerUsers.get('/current', authModule.auth, ctrlUser.getUser)
 routerUsers.patch('/avatars', authModule.auth, multerHelper.upload.single('avatar'), ctrlUser.avatars)
-
+routerUsers.get('/verify/:verifyToken', ctrlUser.verifyToken)
+routerUsers.post('/verify', ctrlUser.doubleEmailVerify)
 module.exports = routerUsers

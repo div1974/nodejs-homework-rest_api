@@ -9,7 +9,6 @@ const app = express()
 
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short'
 
-// app.use(express.static(path.join(__dirname + '/public')))
 app.use(express.static(path.join(process.cwd(), 'public')))
 
 app.use(logger(formatsLogger))
